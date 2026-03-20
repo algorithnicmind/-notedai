@@ -1,5 +1,13 @@
+// Authentication Guard
+if (!localStorage.getItem('currentUser')) {
+    window.location.href = 'auth.html';
+}
+
+const currentUser = localStorage.getItem('currentUser');
+const storageKey = `noted_app_data_${currentUser}`;
+
 // State management
-let notes = JSON.parse(localStorage.getItem('noted_app_data')) || [];
+let notes = JSON.parse(localStorage.getItem(storageKey)) || [];
 let activeNoteId = null;
 let saveTimeout = null;
 
@@ -13,15 +21,12 @@ const noteTitleInput = document.getElementById('note-title');
 const noteContentInput = document.getElementById('note-content');
 const deleteNoteBtn = document.getElementById('delete-note-btn');
 const saveStatus = document.getElementById('save-status');
+const logoutBtn = document.getElementById('logout-btn');
 
 // Initialize App
 function init() {
     renderNotesList();
-    if (notes.length > 0) {
-        showEmptyState();
-    } else {
-        showEmptyState();
-    }
+    showEmptyState();
     setupEventListeners();
 }
 
@@ -36,6 +41,11 @@ function setupEventListeners() {
     
     searchInput.addEventListener('input', (e) => {
         renderNotesList(e.target.value);
+    });
+    
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'auth.html';
     });
 }
 
@@ -180,7 +190,7 @@ function showSaveStatus(text) {
 }
 
 function saveToLocalStorage() {
-    localStorage.setItem('noted_app_data', JSON.stringify(notes));
+    localStorage.setItem(storageKey, JSON.stringify(notes));
 }
 
 function escapeHTML(str) {
